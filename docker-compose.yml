@@ -31,7 +31,7 @@ services:
     depends_on:
       - postgres
     environment:
-      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__CORE__DAGS_FOLDER=/opt/airflow/dags
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-stocks_db}
@@ -40,7 +40,8 @@ services:
       - _AIRFLOW_WWW_USER_PASSWORD=admin
       - _AIRFLOW_WWW_USER_ROLE=Admin
     volumes:
-      - ./dags:/opt/airflow/dags    # 👈 mount dags folder
+      - ./dags:/opt/airflow/dags
+      - airflow_logs:/opt/airflow/logs
     entrypoint: ["/bin/bash", "-c"]
     command:
       - |
@@ -62,12 +63,15 @@ services:
       - airflow-init
       - postgres
     environment:
-      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__CORE__DAGS_FOLDER=/opt/airflow/dags
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-stocks_db}
+      - TICKERS=AAPL,MSFT
+      - TARGET_TABLE=stock_prices
     volumes:
-      - ./dags:/opt/airflow/dags    # 👈 mount dags folder
+      - ./dags:/opt/airflow/dags
+      - airflow_logs:/opt/airflow/logs
     ports:
       - "8080:8080"
     command: webserver
@@ -81,12 +85,15 @@ services:
       - airflow-init
       - postgres
     environment:
-      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__CORE__DAGS_FOLDER=/opt/airflow/dags
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-stocks_db}
+      - TICKERS=AAPL,MSFT
+      - TARGET_TABLE=stock_prices
     volumes:
-      - ./dags:/opt/airflow/dags    # 👈 mount dags folder
+      - ./dags:/opt/airflow/dags
+      - airflow_logs:/opt/airflow/logs
     command: scheduler
 
 volumes:
